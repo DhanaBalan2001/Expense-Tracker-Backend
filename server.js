@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 import pkg from 'mongoose';
 const { connect, connection: _connection } = pkg;
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import expenseRoutes from './routes/expense.js';
 import authRoutes from './routes/auth.js';
 import dashboardRoutes from './routes/dashboard.js';
@@ -23,11 +25,28 @@ EventEmitter.defaultMaxListeners = 15;
 
 dotenv.config();
 
+app.use(cors({
+  origin: ['https://spectacular-cannoli-29ddb1.netlify.app/', 'https://expense-tracker-backend-944r.onrender.com'],
+  credentials: true
+}));
+
 const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '../client/build')));
+
+// The "catchall" handler: for any request that doesn't
+// match one above, send back React's index.html file.
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build/index.html'));
+});
 
 // MongoDB connection
 connect(process.env.MONGODB)
@@ -43,6 +62,12 @@ connection.once('open', () => {
 app.get('/', (req, res) => {
     res.redirect('/api/docs');
 });
+
+// Add a simple health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
 
 // Routes
 app.use('/api/expenses', expenseRoutes);

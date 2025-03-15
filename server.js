@@ -25,27 +25,17 @@ EventEmitter.defaultMaxListeners = 15;
 
 dotenv.config();
 
-app.use(cors({
-  origin: ['https://spectacular-cannoli-29ddb1.netlify.app/', 'https://expense-tracker-backend-944r.onrender.com'],
-  credentials: true
-}));
-
 const app = express();
 const port = process.env.PORT || 5000;
-
-app.use(express.json());
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, '../client/build')));
 
-// The "catchall" handler: for any request that doesn't
-// match one above, send back React's index.html file.
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build/index.html'));
-});
+app.use(cors({
+  origin: ['https://spectacular-cannoli-29ddb1.netlify.app/', 'http://localhost:3000'],
+  credentials: true
+}));
+app.use(express.json());
 
 // MongoDB connection
 connect(process.env.MONGODB)
@@ -82,6 +72,15 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/docs', apiDocsRoutes);
 
 app.use(errorHandler);
+
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '../client/build')));
+
+// The "catchall" handler: for any request that doesn't
+// match one above, send back React's index.html file.
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build/index.html'));
+});
 
 app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);

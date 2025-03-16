@@ -32,7 +32,7 @@ const __dirname = path.dirname(__filename);
 
 
 app.use(cors({
-  origin: ['https://spectacular-cannoli-29ddb1.netlify.app/', 'http://localhost:3000'],
+  origin: ['https://spectacular-cannoli-29ddb1.netlify.app', 'http://localhost:3000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
 }));
